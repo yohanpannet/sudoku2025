@@ -1,0 +1,9 @@
+:host {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    font-size: clamp(10px, 5vw, 40px);
+    /* Auto-scaling text */
+}

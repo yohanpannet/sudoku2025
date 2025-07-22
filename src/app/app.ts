@@ -3,15 +3,17 @@ import { RouterOutlet } from '@angular/router';
 import { AssetReader } from './asset-reader';
 import { MatSelectModule } from '@angular/material/select';
 import { emptySudokuGrid, SudokuGrid } from './model/SudokuCell';
+import { SudokuUICell } from './widget/sudokuUICell/sudoku-uicell/sudoku-uicell';
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
-    MatSelectModule
+    MatSelectModule,
+    SudokuUICell
   ],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App implements OnInit{
   private assetReader = inject(AssetReader);

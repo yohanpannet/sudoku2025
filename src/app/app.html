@@ -11,9 +11,8 @@
 
 <div class="sudoGridContainer">
     @for (cell of selectedGrid.cells; track cell) {
-        <div>
-            {{cell.value}}
-        </div>
+        <app-sudoku-uicell [cell]="cell">
+        </app-sudoku-uicell>
     }
     @empty {
         {{"Select a grid"}}
