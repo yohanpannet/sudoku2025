@@ -1,0 +1,11 @@
+:host {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.sudoGridContainer{
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+
+}
