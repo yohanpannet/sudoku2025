@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { logColor } from './utils/logger';
-import { SudokuCell } from './model/SudokuCell';
+import { SudokuCell, SudokuGrid } from './model/SudokuCell';
+import { filter, map, Observable, tap } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -9,29 +10,36 @@ import { SudokuCell } from './model/SudokuCell';
 export class AssetReader {
 
     private http = inject(HttpClient);
-    
-    getGridList() {
-        this.http.get('GridList.sdm', {responseType: 'text'})
-            .subscribe(data => {
-                console.log(data);
-                let list = data.split('\n');
-                list.filter(line => !line.startsWith('//'))
-                    .map<SudokuCell[]>(this.convertToSudokuCell)
-                    .forEach(el => console.log(el))
+
+    getGridList(): Observable<SudokuGrid[]> {
+        return this.http.get('GridList.sdm', { responseType: 'text' })
+            .pipe(
+                map(data => this.convertToSudokuGrids(data)),
+            )
+    }
+
+    private convertToSudokuGrids(data: string): SudokuGrid[] {
+        let list = data.split('\n');
+        let grids = list.filter(line => !line.startsWith('//'))
+            .map<SudokuCell[]>(this.convertToSudokuCell)
+            .map<SudokuGrid>(cells => {
+                return {
+                    cells: cells
+                }
             })
-        
+        return grids;
     }
 
     private convertToSudokuCell(sdmLine: string): SudokuCell[] {
         return sdmLine.split('')
             .map<SudokuCell>(value => {
                 let intValue = parseInt(value);
-                if ( Number.isNaN(intValue)) {
+                if (Number.isNaN(intValue)) {
                     intValue = 0
                 }
                 return {
                     value: intValue,
-                    startsValues: intValue!=0
+                    startsValues: intValue != 0
                 }
             })
     }

@@ -1,7 +1,13 @@
+<h1>{{ title() }}</h1>
 
+<mat-form-field>
+  <mat-label>Select Grid</mat-label>
+  <mat-select (selectionChange)="onGridSelectionChange($event.value)">
+    @for (grid of grids; track grid) {
+      <mat-option [value]="grid">{{$index}}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
 
-<main class="main">
-  <h1>Hello, {{ title() }}</h1>
-</main>
+<!-- <router-outlet /> -->
 
-<router-outlet />
