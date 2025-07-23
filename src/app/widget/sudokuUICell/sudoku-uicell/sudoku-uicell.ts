@@ -5,6 +5,9 @@ import { SudokuCell } from '../../../model/SudokuCell';
   selector: 'app-sudoku-uicell',
   imports: [],
   templateUrl: './sudoku-uicell.html',
+  host: {
+    '[class.starter]': 'cell.startsValues' 
+  },
   styleUrl: './sudoku-uicell.scss',
   standalone: true,
 

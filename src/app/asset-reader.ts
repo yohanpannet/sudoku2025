@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { logColor } from './utils/logger';
-import { SudokuCell, SudokuGrid } from './model/SudokuCell';
+import { remainAll, SudokuCell, SudokuGrid } from './model/SudokuCell';
 import { filter, map, Observable, tap } from 'rxjs';
 
 @Injectable({
@@ -37,10 +37,14 @@ export class AssetReader {
                 if (Number.isNaN(intValue)) {
                     intValue = 0
                 }
-                return {
+                let cell: SudokuCell = {
                     value: intValue,
                     startsValues: intValue != 0
+                }; 
+                if (!cell.startsValues) {
+                    cell.remain = {...remainAll}
                 }
+                return cell; 
             })
     }
 }

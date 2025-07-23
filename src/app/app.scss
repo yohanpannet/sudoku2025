@@ -4,10 +4,22 @@
     flex-direction: column;
 }
 
-.sudoGridContainer{
+.sudoGridContainer {
     display: grid;
     grid-template-columns: repeat(9, minmax(0, 1fr));
     aspect-ratio: 1 / 1;
     max-height: 70vh;
     max-width: 70vh;
+
+    /* Bold vertical borders after every 3rd column, except last */
+    app-sudoku-uicell:nth-child(3n):not(:nth-child(9n)) {
+        border-right: 2px solid black;
+    }
+
+    /* Bold horizontal borders after every 3rd row */
+    app-sudoku-uicell:nth-child(n + 19):nth-child(-n + 27),
+    app-sudoku-uicell:nth-child(n + 46):nth-child(-n + 54),
+    app-sudoku-uicell:nth-child(n + 73):nth-child(-n + 81) {
+        border-bottom: 2px solid black;
+    }
 }

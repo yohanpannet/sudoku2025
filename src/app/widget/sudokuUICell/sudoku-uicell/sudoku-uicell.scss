@@ -3,7 +3,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     font-size: clamp(10px, 5vw, 40px);
     /* Auto-scaling text */
+}
+
+:host.starter {
+    background-color: var(--mat-sys-secondary-fixed);
+    color:var(--mat-sys-on-secondary-fixed);
 }
