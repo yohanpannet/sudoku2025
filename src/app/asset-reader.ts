@@ -39,10 +39,11 @@ export class AssetReader {
                 }
                 let cell: SudokuCell = {
                     value: intValue,
-                    startsValues: intValue != 0
+                    startsValues: intValue != 0,
+                    remain: new Map(),
                 }; 
                 if (!cell.startsValues) {
-                    cell.remain = {...remainAll}
+                    cell.remain = new Map(remainAll)
                 }
                 return cell; 
             })

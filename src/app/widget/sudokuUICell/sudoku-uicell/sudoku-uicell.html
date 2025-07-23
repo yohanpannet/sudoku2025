@@ -2,5 +2,9 @@
     <div>{{cell.value}}</div>
 }
 @else {
-    
+    <div class="remainingValues">
+        @for (i of numbers; track i) {
+            <div>{{cell.remain.get(i)?i:'' }}</div>
+        }
+    </div>
 }
