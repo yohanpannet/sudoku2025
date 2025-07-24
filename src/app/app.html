@@ -9,7 +9,8 @@
     </mat-select>
 </mat-form-field>
 
-<div class="sudoGridContainer">
+<!-- Soduku Grid(s) -->
+<!-- <div class="sudoGridContainer">
     @for (cell of selectedGrid.cells; track cell) {
         <app-sudoku-uicell [cell]="cell">
         </app-sudoku-uicell>
@@ -17,5 +18,25 @@
     @empty {
         {{"Select a grid"}}
     }
+</div> -->
+
+<div class="sudoGridContainer">
+    @for (cell of cells$ | async; track cell) {
+        <app-sudoku-uicell [cell]="cell">
+        </app-sudoku-uicell>
+    }
+    @empty {
+        {{"Select a grid"}}
+    }
 </div>
+
+<!-- <div class="sudoGridContainer">
+    @for (cell of (selectedGrid$ | async)?.cells; track cell) {
+        <app-sudoku-uicell [cell]="cell">
+        </app-sudoku-uicell>
+    }
+    @empty {
+        {{"Select a grid"}}
+    }
+</div> -->
 <!-- <router-outlet /> -->
