@@ -23,7 +23,7 @@
 </div> -->
 
 <div class="sudoGridContainer">
-    @for (cell of cells$ | async; track cell) {
+    @for (cell of cellsDelay$ | async; track cell) {
     <app-sudoku-uicell [cell]="cell">
     </app-sudoku-uicell>
     }

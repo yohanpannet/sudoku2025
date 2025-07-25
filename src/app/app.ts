@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { AssetReader } from './asset-reader';
 import { MatSelectModule } from '@angular/material/select';
 import { emptySudokuGrid, SudokuCell, SudokuGrid } from './model/SudokuCell';
-import { Observable } from 'rxjs';
+import { concatMap, map, Observable, timer } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { SudokuUICell } from './widget/sudokuUICell/sudoku-uicell/sudoku-uicell';
 import { AsyncPipe } from '@angular/common';
@@ -31,11 +31,18 @@ export class App implements OnInit {
     private sudokuSolverService = inject(SudokuSolver)
 
     protected readonly title = signal('sudoku2025');
+    private TIMER_VALUE = 100;
 
     protected grids: SudokuGrid[] = [];
 
     protected selectedGrid$: Observable<SudokuGrid> = this.store.select<SudokuGrid>(selectGrid);
     protected cells$: Observable<SudokuCell[]> = this.store.select<SudokuCell[]>(selectCells);
+    protected cellsDelay$: Observable<SudokuCell[]> = this.cells$.pipe(
+        concatMap(value =>
+            timer(this.TIMER_VALUE).pipe( // wait 500ms before emitting each value
+                map(() => value)
+            )
+        )) 
 
     constructor(){
     }
@@ -43,11 +50,12 @@ export class App implements OnInit {
     ngOnInit(): void {
         this.assetReader.getGridList().subscribe(grids => this.grids = grids);
         this.selectedGrid$.subscribe(grid => {
-            logColor('>SELCTED GRID STORE', 'red')
-            console.log(grid)
+            //logColor('>SELCTED GRID STORE', 'red')
+            //console.log(grid)
         })
         this.cells$.subscribe(cells => {
-            logColor('SELCTED CELLS STORE', 'red')
+            //logColor('SELCTED CELLS STORE', 'red')
+            //console.log(cells)
         })
     }
 

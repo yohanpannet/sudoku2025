@@ -4,6 +4,7 @@ import { Store } from "@ngrx/store";
 import { Observable, take } from "rxjs";
 import { selectGrid } from "../store/grid.selectors";
 import { logColor } from "../utils/logger";
+import { updateCell } from "../store/grid.action";
 
 @Injectable({
     providedIn: 'root'
@@ -26,6 +27,9 @@ export class SudokuSolver {
         let updatedCells = handler.clearLines();
         logColor(`Clear Cells length: ${updatedCells.size}`, 'green')
         console.log(updatedCells)
+        updatedCells.forEach((value) => {
+            this.store.dispatch(updateCell(value))
+        })
     }
 }
 
