@@ -74,18 +74,8 @@ class GridHandler {
         }
     }
 
-    clearLines(): Map<number, SudokuCell> {
-        let filledCells = this.grid.cells.filter(cell => cell.value != 0)
-        let updatedCells: Map<number, SudokuCell> = new Map();
-        filledCells.forEach(filledCell => {
-            let cells = this.clearLine(filledCell);
-            cells.forEach( cell => updatedCells.set(cell.index, cell))
-        })
-        return updatedCells;
-    }
-
-    clearLine(cell: SudokuCell): SudokuCell[] {
-        let emptyCells = this.getLineEmptyCell(cell.index);
+    //Common functions
+    private clearCells(cell: SudokuCell, emptyCells: SudokuCell[]) {
         return emptyCells
             .filter(emptyCell => emptyCell.remain.get(cell.value))
             .map(emptyCell => {
@@ -94,45 +84,54 @@ class GridHandler {
             })
     }
 
-    getLine(cellIndex: number): SudokuCell[] {
-        return this.grid.cells.filter(cell => Math.floor(cell.index/9) === Math.floor(cellIndex/9));
-    }
-
-    getLineEmptyCell(cellIndex: number): SudokuCell[] {
-        let cells = this.getLine(cellIndex);
-        return this.getEmptyCells(cells);
-    }
-
-    getEmptyCells(cells: SudokuCell[]): SudokuCell[] {
+    private getEmptyCells(cells: SudokuCell[]): SudokuCell[] {
         return cells.filter(cell=>cell.value === 0)
     }
 
-    clearCols(): Map<number, SudokuCell> {
+    private clearZones(zone: 'line'|'col'|'block'): Map<number, SudokuCell> {
         let filledCells = this.grid.cells.filter(cell => cell.value != 0)
         let updatedCells: Map<number, SudokuCell> = new Map();
         filledCells.forEach(filledCell => {
-            let cells = this.clearCol(filledCell);
-            cells.forEach( cell => updatedCells.set(cell.index, cell))
+            let zoneCells: SudokuCell[] = [];
+            switch (zone) {
+                case 'line': 
+                    zoneCells = this.getLine(filledCell.index);
+                    break;
+                case 'col':
+                    zoneCells = this.getColumn(filledCell.index);
+                    break;
+                case 'block':
+                    //zoneCells = this.getBlock(filledCell.index);
+                    break;
+            }
+            let emptyCells = this.getEmptyCells(zoneCells)
+            this.clearCells(filledCell, emptyCells)
+                .forEach( cell => updatedCells.set(cell.index, cell))
         })
         return updatedCells;
     }
 
-    clearCol(cell: SudokuCell): SudokuCell[] {
-        let emptyCells = this.getColEmptyCell(cell.index);
-        return emptyCells
-            .filter(emptyCell => emptyCell.remain.get(cell.value))
-            .map(emptyCell => {
-                emptyCell.remain.set(cell.value, false);
-                return emptyCell
-            })
+    // Lines
+    clearLines(): Map<number, SudokuCell> {
+        return this.clearZones('line');
     }
 
-    getColEmptyCell(cellIndex: number): SudokuCell[] {
-        let cells = this.getColumn(cellIndex);
-        return this.getEmptyCells(cells);
+    private getLine(cellIndex: number): SudokuCell[] {
+        return this.grid.cells.filter(cell => Math.floor(cell.index/9) === Math.floor(cellIndex/9));
     }
 
-    getColumn(cellIndex: number): SudokuCell[] {
+    //Cols
+    clearCols(): Map<number, SudokuCell> {
+        return this.clearZones('col');
+    }
+
+    private getColumn(cellIndex: number): SudokuCell[] {
         return this.grid.cells.filter(cell => cell.index%9 === cellIndex%9);
     }
+
+    //blocks
+    clearBlocks(): Map<number, SudokuCell> {
+        return this.clearZones('block');
+    }
+
 }
