@@ -32,12 +32,13 @@ export class AssetReader {
 
     private convertToSudokuCell(sdmLine: string): SudokuCell[] {
         return sdmLine.split('')
-            .map<SudokuCell>(value => {
+            .map<SudokuCell>((value, index) => {
                 let intValue = parseInt(value);
                 if (Number.isNaN(intValue)) {
                     intValue = 0
                 }
                 let cell: SudokuCell = {
+                    index,
                     value: intValue,
                     startsValues: intValue != 0,
                     remain: new Map(),

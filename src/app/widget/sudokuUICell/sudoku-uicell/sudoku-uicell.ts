@@ -15,6 +15,7 @@ import { SudokuCell } from '../../../model/SudokuCell';
 export class SudokuUICell {
 
     @Input({ required: true }) cell: SudokuCell = {
+        index: 0,
         startsValues: false,
         value: 0,
         remain: new Map(),

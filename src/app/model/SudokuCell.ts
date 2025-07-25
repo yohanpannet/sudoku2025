@@ -1,4 +1,5 @@
 export interface SudokuCell {
+    index: number,
     value: number;
     startsValues: boolean;
     remain:Map<number,boolean>,
@@ -29,6 +30,7 @@ function getEmptyGrid(): SudokuGrid {
     }
     for (let i = 0; i<81; i++) {
         grid.cells.push({
+            index: i,
             value: 0,
             startsValues: false,
             remain: new Map()

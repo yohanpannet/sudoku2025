@@ -1,14 +1,16 @@
 <h1>{{ title() }}</h1>
+<div class="commandBloc">
+    <mat-form-field>
+        <mat-label>Select Grid</mat-label>
+        <mat-select (selectionChange)="onGridSelectionChange($event.value)">
+            @for (grid of grids; track grid) {
+            <mat-option [value]="grid">{{$index}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
 
-<mat-form-field>
-    <mat-label>Select Grid</mat-label>
-    <mat-select (selectionChange)="onGridSelectionChange($event.value)">
-        @for (grid of grids; track grid) {
-        <mat-option [value]="grid">{{$index}}</mat-option>
-        }
-    </mat-select>
-</mat-form-field>
-
+    <button matButton="filled" (click)="clearCells()">Clear</button>
+</div>
 <!-- Soduku Grid(s) -->
 <!-- <div class="sudoGridContainer">
     @for (cell of selectedGrid.cells; track cell) {
@@ -22,11 +24,11 @@
 
 <div class="sudoGridContainer">
     @for (cell of cells$ | async; track cell) {
-        <app-sudoku-uicell [cell]="cell">
-        </app-sudoku-uicell>
+    <app-sudoku-uicell [cell]="cell">
+    </app-sudoku-uicell>
     }
     @empty {
-        {{"Select a grid"}}
+    {{"Select a grid"}}
     }
 </div>
 

@@ -4,6 +4,10 @@
     flex-direction: column;
 }
 
+.commandBloc {
+    
+}
+
 .sudoGridContainer {
     display: grid;
     grid-template-columns: repeat(9, minmax(0, 1fr));

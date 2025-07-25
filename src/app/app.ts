@@ -10,12 +10,15 @@ import { AsyncPipe } from '@angular/common';
 import { loadGrid } from './store/grid.action';
 import { logColor } from './utils/logger';
 import { selectCells, selectGrid } from './store/grid.selectors';
+import { MatButtonModule } from '@angular/material/button';
+import { SudokuSolver } from './solver/sudoku-solver.service';
 
 @Component({
     selector: 'app-root',
     imports: [
         RouterOutlet,
         MatSelectModule,
+        MatButtonModule,
         SudokuUICell,
         AsyncPipe
     ],
@@ -25,6 +28,7 @@ import { selectCells, selectGrid } from './store/grid.selectors';
 export class App implements OnInit {
     private assetReader = inject(AssetReader);
     private store = inject(Store<{ grid: SudokuGrid }>);
+    private sudokuSolverService = inject(SudokuSolver)
 
     protected readonly title = signal('sudoku2025');
 
@@ -39,18 +43,20 @@ export class App implements OnInit {
     ngOnInit(): void {
         this.assetReader.getGridList().subscribe(grids => this.grids = grids);
         this.selectedGrid$.subscribe(grid => {
-            logColor('SELCTED GRID STORE', 'red')
+            logColor('>SELCTED GRID STORE', 'red')
             console.log(grid)
         })
         this.cells$.subscribe(cells => {
             logColor('SELCTED CELLS STORE', 'red')
-            if (cells) {
-                cells.forEach(cell => logColor(`got cell ${cell.value}`, 'green'))
-            }
         })
     }
 
     onGridSelectionChange(grid: SudokuGrid) {
         this.store.dispatch(loadGrid(grid));
+    }
+
+    clearCells() {
+        console.log('clear')
+        this.sudokuSolverService.clearGrid()
     }
 }
