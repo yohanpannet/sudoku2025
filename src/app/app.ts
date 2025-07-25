@@ -31,7 +31,7 @@ export class App implements OnInit {
     private sudokuSolverService = inject(SudokuSolver)
 
     protected readonly title = signal('sudoku2025');
-    private TIMER_VALUE = 100;
+    private TIMER_VALUE = 50;
 
     protected grids: SudokuGrid[] = [];
 

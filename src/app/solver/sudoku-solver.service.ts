@@ -5,6 +5,7 @@ import { Observable, take, tap } from "rxjs";
 import { selectGrid } from "../store/grid.selectors";
 import { logColor } from "../utils/logger";
 import { updateCell } from "../store/grid.action";
+import { GridHandler } from "./grid-handler";
 
 @Injectable({
     providedIn: 'root'
@@ -21,6 +22,9 @@ export class SudokuSolver {
         .subscribe()
         await this.getSelectedGrid().pipe(
             tap(grid => this.clearCols(grid))
+        ).subscribe()
+        await this.getSelectedGrid().pipe(
+            tap(grid => this.clearBlocks(grid))
         ).subscribe()
 
     }
@@ -50,88 +54,15 @@ export class SudokuSolver {
             this.store.dispatch(updateCell(value))
         })
     }
+
+    private clearBlocks(grid: SudokuGrid) {
+        let handler = new GridHandler({...grid});
+        let updatedCells = handler.clearBlocks();
+        logColor(`Clear Blocks length: ${updatedCells.size}`, 'green')
+        console.log(updatedCells)
+        updatedCells.forEach((value) => {
+            this.store.dispatch(updateCell(value))
+        })
+    }
 }
 
-class GridHandler {
-    private grid: SudokuGrid;
-
-    constructor(inputGrid: SudokuGrid) {
-        // Deep Copy needed as to not alter state
-        this.grid = this.deepCopyGrid(inputGrid)
-    }
-
-    private deepCopyGrid(inputGrid: SudokuGrid): SudokuGrid {
-        let cells = inputGrid.cells.map(cell => {
-            return {
-                ...cell,
-                remain: new Map(cell.remain)
-            }
-
-        })
-        return {
-            ...inputGrid,
-            cells
-        }
-    }
-
-    //Common functions
-    private clearCells(cell: SudokuCell, emptyCells: SudokuCell[]) {
-        return emptyCells
-            .filter(emptyCell => emptyCell.remain.get(cell.value))
-            .map(emptyCell => {
-                emptyCell.remain.set(cell.value, false);
-                return emptyCell
-            })
-    }
-
-    private getEmptyCells(cells: SudokuCell[]): SudokuCell[] {
-        return cells.filter(cell=>cell.value === 0)
-    }
-
-    private clearZones(zone: 'line'|'col'|'block'): Map<number, SudokuCell> {
-        let filledCells = this.grid.cells.filter(cell => cell.value != 0)
-        let updatedCells: Map<number, SudokuCell> = new Map();
-        filledCells.forEach(filledCell => {
-            let zoneCells: SudokuCell[] = [];
-            switch (zone) {
-                case 'line': 
-                    zoneCells = this.getLine(filledCell.index);
-                    break;
-                case 'col':
-                    zoneCells = this.getColumn(filledCell.index);
-                    break;
-                case 'block':
-                    //zoneCells = this.getBlock(filledCell.index);
-                    break;
-            }
-            let emptyCells = this.getEmptyCells(zoneCells)
-            this.clearCells(filledCell, emptyCells)
-                .forEach( cell => updatedCells.set(cell.index, cell))
-        })
-        return updatedCells;
-    }
-
-    // Lines
-    clearLines(): Map<number, SudokuCell> {
-        return this.clearZones('line');
-    }
-
-    private getLine(cellIndex: number): SudokuCell[] {
-        return this.grid.cells.filter(cell => Math.floor(cell.index/9) === Math.floor(cellIndex/9));
-    }
-
-    //Cols
-    clearCols(): Map<number, SudokuCell> {
-        return this.clearZones('col');
-    }
-
-    private getColumn(cellIndex: number): SudokuCell[] {
-        return this.grid.cells.filter(cell => cell.index%9 === cellIndex%9);
-    }
-
-    //blocks
-    clearBlocks(): Map<number, SudokuCell> {
-        return this.clearZones('block');
-    }
-
-}
