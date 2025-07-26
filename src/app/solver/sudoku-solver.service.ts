@@ -16,16 +16,32 @@ export class SudokuSolver {
     
 
     async clearGrid() {
+        let updateCount = 0;
         await this.getSelectedGrid().pipe(
-            tap(grid => this.clearZones(grid, 'line'))
+            tap(grid => {
+                updateCount += this.clearZones(grid, 'line')
+            })
         )
         .subscribe()
         await this.getSelectedGrid().pipe(
-            tap(grid => this.clearZones(grid, 'col'))
+            tap(grid => {
+                updateCount += this.clearZones(grid, 'col')
+            })
         ).subscribe()
         await this.getSelectedGrid().pipe(
-            tap(grid => this.clearZones(grid, 'block'))
+            tap(grid => {
+                updateCount += this.clearZones(grid, 'block')
+            })
         ).subscribe()
+
+        if (updateCount > 0) {
+            await this.getSelectedGrid().pipe(
+                tap(grid => {
+                    this.setSolvedCells(grid)
+                })
+            ).subscribe()
+        }
+        
 
     }
 
@@ -44,6 +60,14 @@ export class SudokuSolver {
             this.store.dispatch(updateCell(value))
         })
         return updatedCells.size;
+    }
+
+    private setSolvedCells(grid: SudokuGrid) {
+        let handler = new GridHandler({...grid});
+        let updatedCells = handler.setSolvedCells();
+        updatedCells.forEach((cell) => {
+            this.store.dispatch(updateCell(cell))
+        })
     }
 
 }

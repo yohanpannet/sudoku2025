@@ -79,6 +79,30 @@ export class GridHandler {
         return cells;
     }
 
+    setSolvedCells() : SudokuCell[]{
+        logColor('SetSolvedCells', 'darkred')
+        let solvedCells = this.grid.cells
+            .filter(cell => cell.value === 0)
+            .filter(cell => { //filter cells that have only 1 remain at true
+                let trueCount = 0;
+                let lastTrue = 0
+                cell.remain.forEach((val, num) => {
+                    if (val) {
+                        trueCount++;
+                        lastTrue = num
+                    }
+                })
+                if (trueCount === 1) {
+                    cell.value = lastTrue;
+                    return true;
+                } else {
+                    return false
+                }
+            })
+        
+        return solvedCells;
+    }
+
 }
 
 const blockIndexMatrix = [0, 1, 2, 9, 10, 11, 18, 19, 20]
