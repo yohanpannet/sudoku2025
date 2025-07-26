@@ -40,6 +40,9 @@ export class SudokuSolver {
                     this.setSolvedCells(grid)
                 })
             ).subscribe()
+            this.clearGrid();
+        } else {
+            logColor('End Of ClearGrid', 'darkred')
         }
         
 
@@ -54,8 +57,8 @@ export class SudokuSolver {
     private clearZones(grid: SudokuGrid, zone: 'line'|'col'|'block'): number {
         let handler = new GridHandler({...grid});
         let updatedCells = handler.clearZones(zone);
-        logColor(`Clear Cells length: ${updatedCells.size}`, 'green')
-        console.log(updatedCells)
+        // logColor(`Clear Cells length: ${updatedCells.size}`, 'green')
+        // console.log(updatedCells)
         updatedCells.forEach((value) => {
             this.store.dispatch(updateCell(value))
         })
