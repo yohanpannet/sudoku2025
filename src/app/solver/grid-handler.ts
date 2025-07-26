@@ -37,7 +37,7 @@ export class GridHandler {
         return cells.filter(cell=>cell.value === 0)
     }
 
-    private clearZones(zone: 'line'|'col'|'block'): Map<number, SudokuCell> {
+    clearZones(zone: 'line'|'col'|'block'): Map<number, SudokuCell> {
         let filledCells = this.grid.cells.filter(cell => cell.value != 0)
         let updatedCells: Map<number, SudokuCell> = new Map();
         filledCells.forEach(filledCell => {
@@ -60,27 +60,12 @@ export class GridHandler {
         return updatedCells;
     }
 
-    // Lines
-    clearLines(): Map<number, SudokuCell> {
-        return this.clearZones('line');
-    }
-
     private getLine(cellIndex: number): SudokuCell[] {
         return this.grid.cells.filter(cell => Math.floor(cell.index/9) === Math.floor(cellIndex/9));
     }
 
-    //Cols
-    clearCols(): Map<number, SudokuCell> {
-        return this.clearZones('col');
-    }
-
     private getColumn(cellIndex: number): SudokuCell[] {
         return this.grid.cells.filter(cell => cell.index%9 === cellIndex%9);
-    }
-
-    //blocks
-    clearBlocks(): Map<number, SudokuCell> {
-        return this.clearZones('block');
     }
 
     private getBlock(cellIndex: number): SudokuCell[] {

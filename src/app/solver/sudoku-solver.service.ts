@@ -17,14 +17,14 @@ export class SudokuSolver {
 
     async clearGrid() {
         await this.getSelectedGrid().pipe(
-            tap(grid => this.clearLines(grid))
+            tap(grid => this.clearZones(grid, 'line'))
         )
         .subscribe()
         await this.getSelectedGrid().pipe(
-            tap(grid => this.clearCols(grid))
+            tap(grid => this.clearZones(grid, 'col'))
         ).subscribe()
         await this.getSelectedGrid().pipe(
-            tap(grid => this.clearBlocks(grid))
+            tap(grid => this.clearZones(grid, 'block'))
         ).subscribe()
 
     }
@@ -35,34 +35,16 @@ export class SudokuSolver {
         )
     }
 
-    private clearLines(grid: SudokuGrid) {
+    private clearZones(grid: SudokuGrid, zone: 'line'|'col'|'block'): number {
         let handler = new GridHandler({...grid});
-        let updatedCells = handler.clearLines();
+        let updatedCells = handler.clearZones(zone);
         logColor(`Clear Cells length: ${updatedCells.size}`, 'green')
         console.log(updatedCells)
         updatedCells.forEach((value) => {
             this.store.dispatch(updateCell(value))
         })
+        return updatedCells.size;
     }
 
-    private clearCols(grid: SudokuGrid) {
-        let handler = new GridHandler({...grid});
-        let updatedCells = handler.clearCols();
-        logColor(`Clear Cols length: ${updatedCells.size}`, 'green')
-        console.log(updatedCells)
-        updatedCells.forEach((value) => {
-            this.store.dispatch(updateCell(value))
-        })
-    }
-
-    private clearBlocks(grid: SudokuGrid) {
-        let handler = new GridHandler({...grid});
-        let updatedCells = handler.clearBlocks();
-        logColor(`Clear Blocks length: ${updatedCells.size}`, 'green')
-        console.log(updatedCells)
-        updatedCells.forEach((value) => {
-            this.store.dispatch(updateCell(value))
-        })
-    }
 }
 
