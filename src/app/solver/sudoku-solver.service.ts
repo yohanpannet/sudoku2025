@@ -16,6 +16,22 @@ export class SudokuSolver {
     
 
     async clearGrid() {
+        let updateCount = await this.updateRemaining();
+
+        if (updateCount > 0) {
+            await this.getSelectedGrid().pipe(
+                tap(grid => {
+                    this.setSolvedCells(grid)
+                })
+            ).subscribe()
+            this.clearGrid();
+        } else {
+            logColor('End Of ClearGrid', 'darkred')
+        }   
+
+    }
+
+    private async updateRemaining(): Promise<number> {
         let updateCount = 0;
         await this.getSelectedGrid().pipe(
             tap(grid => {
@@ -34,17 +50,7 @@ export class SudokuSolver {
             })
         ).subscribe()
 
-        if (updateCount > 0) {
-            await this.getSelectedGrid().pipe(
-                tap(grid => {
-                    this.setSolvedCells(grid)
-                })
-            ).subscribe()
-            this.clearGrid();
-        } else {
-            logColor('End Of ClearGrid', 'darkred')
-        }   
-
+        return updateCount
     }
 
     async doZoneSingles() {
