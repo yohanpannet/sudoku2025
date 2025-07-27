@@ -18,14 +18,14 @@ export class SudokuSolver {
 
     async clearGrid() {
         let updateCount = await this.updateRemaining();
-        let grid = await firstValueFrom(this.getSelectedGrid());
+        let grid = await this.getSelectedGrid();
         updateCount += this.setSolvedCells(grid)
 
         if (updateCount > 0) {
             this.clearGrid();
         } else {
             if (isGridValid(grid)) {
-                logColor(`Houray!!!!  SUdoSolved `, 'darkBlue')
+                logColor(`Houray!!!!  SudoSolved `, 'darkBlue')
             } else {
                 logColor('End Of ClearGrid - Not solved :( ', 'darkred')
             }
@@ -35,22 +35,12 @@ export class SudokuSolver {
 
     private async updateRemaining(): Promise<number> {
         let updateCount = 0;
-        await this.getSelectedGrid().pipe(
-            tap(grid => {
-                updateCount += this.clearZones(grid, 'line')
-            })
-        )
-        .subscribe()
-        await this.getSelectedGrid().pipe(
-            tap(grid => {
-                updateCount += this.clearZones(grid, 'col')
-            })
-        ).subscribe()
-        await this.getSelectedGrid().pipe(
-            tap(grid => {
-                updateCount += this.clearZones(grid, 'block')
-            })
-        ).subscribe()
+        let grid = await this.getSelectedGrid();
+        updateCount += this.clearZones(grid, 'line')
+        grid = await this.getSelectedGrid();
+        updateCount += this.clearZones(grid, 'col')
+        grid = await this.getSelectedGrid();
+        updateCount += this.clearZones(grid, 'block')
 
         return updateCount
     }
@@ -58,37 +48,30 @@ export class SudokuSolver {
     async doZoneSingles() {
         await this.updateRemaining();
         let updateCount = 0;
-        await this.getSelectedGrid().pipe(
-            tap(grid => {
-                updateCount += this.spotZoneSingles(grid, 'line')
-            })
-        ).subscribe();
+        let grid = await this.getSelectedGrid();
+        updateCount += this.spotZoneSingles(grid, 'line')
         await this.updateRemaining();
-        await this.getSelectedGrid().pipe(
-            tap(grid => {
-                updateCount += this.spotZoneSingles(grid, 'col')
-            })
-        ).subscribe();
+        grid = await this.getSelectedGrid();
+        updateCount += this.spotZoneSingles(grid, 'col')
         await this.updateRemaining();
-        await this.getSelectedGrid().pipe(
-            tap(grid => {
-                updateCount += this.spotZoneSingles(grid, 'block')
-            })
-        ).subscribe();
+        grid = await this.getSelectedGrid();
+        updateCount += this.spotZoneSingles(grid, 'block')
         logColor(`doZoneSingles - ${updateCount}`, 'darkgreen')
         await this.updateRemaining();
         if (updateCount > 0) {
             await this.doZoneSingles()
         } else {
-            logColor('End Of ZoneSingles', 'darkred')
+            if (isGridValid(grid)) {
+                logColor(`Houray!!!!  SudoSolved `, 'darkBlue')
+            } else {
+                logColor('End Of doZoneSingles - Not solved :( ', 'darkred')
+            }
 
         }
     }
 
-    private getSelectedGrid(): Observable<SudokuGrid> {
-        return this.selectedGrid$.pipe(
-            take(1)
-        )
+    private getSelectedGrid(): Promise<SudokuGrid> {
+        return firstValueFrom(this.selectedGrid$)
     }
 
     private clearZones(grid: SudokuGrid, zone: 'line'|'col'|'block'): number {
