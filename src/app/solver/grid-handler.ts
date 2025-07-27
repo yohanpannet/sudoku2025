@@ -1,4 +1,4 @@
-import { SudokuGrid, SudokuCell } from "../model/SudokuCell";
+import { SudokuGrid, SudokuCell, remainNone } from "../model/SudokuCell";
 import { logColor } from "../utils/logger";
 
 export class GridHandler {
@@ -64,8 +64,24 @@ export class GridHandler {
         return this.grid.cells.filter(cell => Math.floor(cell.index/9) === Math.floor(cellIndex/9));
     }
 
+    private getLines(): SudokuCell[][] {
+        let lines = [];
+        for(let i = 0; i <9; i++) {
+            lines.push(this.getLine(i*9));
+        }
+        return lines;
+    }
+
     private getColumn(cellIndex: number): SudokuCell[] {
         return this.grid.cells.filter(cell => cell.index%9 === cellIndex%9);
+    }
+
+    private getColumns(): SudokuCell[][] {
+        let lines = [];
+        for(let i = 0; i <9; i++) {
+            lines.push(this.getColumn(i));
+        }
+        return lines;
     }
 
     private getBlock(cellIndex: number): SudokuCell[] {
@@ -77,6 +93,15 @@ export class GridHandler {
         })
         let cells = cellIndexes.map(index => this.grid.cells[index]);
         return cells;
+    }
+
+    private getBlocks(): SudokuCell[][] {
+        let lines = [
+            this.getBlock(0), this.getBlock(3), this.getBlock(6),
+            this.getBlock(27), this.getBlock(30), this.getBlock(33),
+            this.getBlock(54), this.getBlock(57), this.getBlock(60)];
+        
+        return lines;
     }
 
     setSolvedCells() : SudokuCell[]{
@@ -94,6 +119,7 @@ export class GridHandler {
                 })
                 if (trueCount === 1) {
                     cell.value = lastTrue;
+                    cell.remain = remainNone;
                     return true;
                 } else {
                     return false
@@ -101,6 +127,55 @@ export class GridHandler {
             })
         
         return solvedCells;
+    }
+
+    /**
+     * FOr each zone, search for values which has only 1 cell where it 'remains'.
+     * @param zone 
+     * @returns 
+     */
+    spotZonesSingles(zone: 'line'|'col'|'block'): Map<number, SudokuCell> { 
+        let updatedCells: Map<number, SudokuCell> = new Map();
+        let zones: SudokuCell[][] = [];
+            switch (zone) {
+                case 'line': 
+                    zones = this.getLines();
+                    break;
+                case 'col':
+                    zones = this.getColumns();
+                    break;
+                case 'block':
+                    zones = this.getBlocks();
+                    break;
+            }
+        logColor(`spotZonesSingles - ${zone}`,'darkred')
+        zones.forEach(zone => {
+            this.spotZoneSingles(zone).forEach(singleCell => {
+                updatedCells.set(singleCell.index, singleCell)
+            })
+        })
+        logColor(`spotZonesSingles ${zone} - ${updatedCells.size}`, 'darkred')
+        return updatedCells;
+    }
+
+    private spotZoneSingles(cells: SudokuCell[]): SudokuCell[] {
+        let singleCells: SudokuCell[] = [];
+        let empties = this.getEmptyCells(cells);
+        // i is the value we search
+        for (let i = 1; i<=9; i++) {
+            let remainingFor = this.getRemainingFor(i, empties);
+            if (remainingFor.length === 1) {
+                let cell = remainingFor[0];
+                cell.value = i;
+                cell.remain = remainNone;
+                singleCells.push(cell);
+            }
+        }
+        return singleCells;
+    }
+
+    private getRemainingFor(value: number, cells: SudokuCell[]): SudokuCell[] {
+        return cells.filter(cell => cell.remain.get(value));
     }
 
 }

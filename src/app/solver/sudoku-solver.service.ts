@@ -43,9 +43,28 @@ export class SudokuSolver {
             this.clearGrid();
         } else {
             logColor('End Of ClearGrid', 'darkred')
-        }
-        
+        }   
 
+    }
+
+    async doZoneSingles() {
+        let updateCount = 0;
+        await this.getSelectedGrid().pipe(
+            tap(grid => {
+                updateCount = this.spotZoneSingles(grid, 'line')
+            })
+        ).subscribe();
+        await this.getSelectedGrid().pipe(
+            tap(grid => {
+                updateCount = this.spotZoneSingles(grid, 'col')
+            })
+        ).subscribe();
+        await this.getSelectedGrid().pipe(
+            tap(grid => {
+                updateCount = this.spotZoneSingles(grid, 'block')
+            })
+        ).subscribe();
+        logColor(`doZoneSingles - ${updateCount}`, 'darkgreen')
     }
 
     private getSelectedGrid(): Observable<SudokuGrid> {
@@ -71,6 +90,18 @@ export class SudokuSolver {
         updatedCells.forEach((cell) => {
             this.store.dispatch(updateCell(cell))
         })
+    }
+
+    private spotZoneSingles(grid: SudokuGrid, zone: 'line'|'col'|'block'): number {
+        let handler = new GridHandler({...grid});
+        logColor('spotZoneSingles', 'green')
+        let updatedCells = handler.spotZonesSingles(zone);
+        // logColor(`Clear Cells length: ${updatedCells.size}`, 'green')
+        // console.log(updatedCells)
+        updatedCells.forEach((value) => {
+            this.store.dispatch(updateCell(value))
+        })
+        return updatedCells.size;
     }
 
 }

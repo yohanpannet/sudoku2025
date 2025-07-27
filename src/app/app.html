@@ -10,17 +10,8 @@
     </mat-form-field>
 
     <button matButton="filled" (click)="clearCells()">Clear</button>
+    <button matButton="filled" (click)="doZoneSingles()">ZoneSingles</button>
 </div>
-<!-- Soduku Grid(s) -->
-<!-- <div class="sudoGridContainer">
-    @for (cell of selectedGrid.cells; track cell) {
-        <app-sudoku-uicell [cell]="cell">
-        </app-sudoku-uicell>
-    }
-    @empty {
-        {{"Select a grid"}}
-    }
-</div> -->
 
 <div class="sudoGridContainer">
     @for (cell of cellsDelay$ | async; track cell) {
