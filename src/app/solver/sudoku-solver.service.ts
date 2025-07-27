@@ -17,13 +17,13 @@ export class SudokuSolver {
 
     async clearGrid() {
         let updateCount = await this.updateRemaining();
-
-        if (updateCount > 0) {
-            await this.getSelectedGrid().pipe(
+        await this.getSelectedGrid().pipe(
                 tap(grid => {
-                    this.setSolvedCells(grid)
+                    updateCount += this.setSolvedCells(grid)
                 })
             ).subscribe()
+
+        if (updateCount > 0) {
             this.clearGrid();
         } else {
             logColor('End Of ClearGrid', 'darkred')
@@ -54,23 +54,33 @@ export class SudokuSolver {
     }
 
     async doZoneSingles() {
+        await this.updateRemaining();
         let updateCount = 0;
         await this.getSelectedGrid().pipe(
             tap(grid => {
-                updateCount = this.spotZoneSingles(grid, 'line')
+                updateCount += this.spotZoneSingles(grid, 'line')
             })
         ).subscribe();
+        await this.updateRemaining();
         await this.getSelectedGrid().pipe(
             tap(grid => {
-                updateCount = this.spotZoneSingles(grid, 'col')
+                updateCount += this.spotZoneSingles(grid, 'col')
             })
         ).subscribe();
+        await this.updateRemaining();
         await this.getSelectedGrid().pipe(
             tap(grid => {
-                updateCount = this.spotZoneSingles(grid, 'block')
+                updateCount += this.spotZoneSingles(grid, 'block')
             })
         ).subscribe();
         logColor(`doZoneSingles - ${updateCount}`, 'darkgreen')
+        await this.updateRemaining();
+        if (updateCount > 0) {
+            await this.doZoneSingles()
+        } else {
+            logColor('End Of ZoneSingles', 'darkred')
+
+        }
     }
 
     private getSelectedGrid(): Observable<SudokuGrid> {
@@ -90,12 +100,13 @@ export class SudokuSolver {
         return updatedCells.size;
     }
 
-    private setSolvedCells(grid: SudokuGrid) {
+    private setSolvedCells(grid: SudokuGrid): number {
         let handler = new GridHandler({...grid});
         let updatedCells = handler.setSolvedCells();
         updatedCells.forEach((cell) => {
             this.store.dispatch(updateCell(cell))
         })
+        return updatedCells.length;
     }
 
     private spotZoneSingles(grid: SudokuGrid, zone: 'line'|'col'|'block'): number {

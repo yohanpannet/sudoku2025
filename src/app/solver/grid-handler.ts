@@ -169,6 +169,7 @@ export class GridHandler {
                 cell.value = i;
                 cell.remain = remainNone;
                 singleCells.push(cell);
+                logColor(`Single Cell spotted: ${cell.index}, ${cell.value}`, 'darkgreen')
             }
         }
         return singleCells;
