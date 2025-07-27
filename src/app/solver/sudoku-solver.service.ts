@@ -1,11 +1,12 @@
 import { inject, Injectable } from "@angular/core";
 import { SudokuCell, SudokuGrid } from "../model/SudokuCell";
 import { Store } from "@ngrx/store";
-import { Observable, take, tap } from "rxjs";
+import { firstValueFrom, Observable, take, tap } from "rxjs";
 import { selectGrid } from "../store/grid.selectors";
 import { logColor } from "../utils/logger";
 import { updateCell } from "../store/grid.action";
 import { GridHandler } from "./grid-handler";
+import { isGridValid } from "./grid-validator";
 
 @Injectable({
     providedIn: 'root'
@@ -17,16 +18,17 @@ export class SudokuSolver {
 
     async clearGrid() {
         let updateCount = await this.updateRemaining();
-        await this.getSelectedGrid().pipe(
-                tap(grid => {
-                    updateCount += this.setSolvedCells(grid)
-                })
-            ).subscribe()
+        let grid = await firstValueFrom(this.getSelectedGrid());
+        updateCount += this.setSolvedCells(grid)
 
         if (updateCount > 0) {
             this.clearGrid();
         } else {
-            logColor('End Of ClearGrid', 'darkred')
+            if (isGridValid(grid)) {
+                logColor(`Houray!!!!  SUdoSolved `, 'darkBlue')
+            } else {
+                logColor('End Of ClearGrid - Not solved :( ', 'darkred')
+            }
         }   
 
     }

@@ -64,7 +64,7 @@ export class GridHandler {
         return this.grid.cells.filter(cell => Math.floor(cell.index/9) === Math.floor(cellIndex/9));
     }
 
-    private getLines(): SudokuCell[][] {
+    getLines(): SudokuCell[][] {
         let lines = [];
         for(let i = 0; i <9; i++) {
             lines.push(this.getLine(i*9));
@@ -76,7 +76,7 @@ export class GridHandler {
         return this.grid.cells.filter(cell => cell.index%9 === cellIndex%9);
     }
 
-    private getColumns(): SudokuCell[][] {
+    getColumns(): SudokuCell[][] {
         let lines = [];
         for(let i = 0; i <9; i++) {
             lines.push(this.getColumn(i));
@@ -95,7 +95,7 @@ export class GridHandler {
         return cells;
     }
 
-    private getBlocks(): SudokuCell[][] {
+    getBlocks(): SudokuCell[][] {
         let lines = [
             this.getBlock(0), this.getBlock(3), this.getBlock(6),
             this.getBlock(27), this.getBlock(30), this.getBlock(33),
